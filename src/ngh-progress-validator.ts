@@ -33,6 +33,16 @@ async function findStatus(dir: string): Promise<string[]> {
 	throw 'No status found for ' + dir
 }
 
+const stat = promisify(fs.stat);
+async function getFiles(dir: string) : Promise<string[]> {
+  const subdirs = await readdir(dir);
+  const files = await Promise.all(subdirs.map(async (subdir) => {
+    const res = path.resolve(dir, subdir);
+    return (await stat(res)).isDirectory() ? getFiles(res) : [res];
+  }));
+  return files.reduce((a, f) => a.concat(f), []);
+}
+
 export const validateProgress = async (
 	workspaceRoot: string,
 	mdGlob: string
@@ -57,6 +67,9 @@ export const validateProgress = async (
 		)
 	})
 	core.info(filePaths.join(' - '))
+
+	const wsFiles = await getFiles(workspaceRoot)
+	core.debug(wsFiles.join(' | '))
 
 	return await Promise.all(
 		filePaths.map(async filePath => {

@@ -61,6 +61,17 @@ function findStatus(dir) {
         throw 'No status found for ' + dir;
     });
 }
+const stat = (0, util_1.promisify)(fs.stat);
+function getFiles(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const subdirs = yield readdir(dir);
+        const files = yield Promise.all(subdirs.map((subdir) => __awaiter(this, void 0, void 0, function* () {
+            const res = path.resolve(dir, subdir);
+            return (yield stat(res)).isDirectory() ? getFiles(res) : [res];
+        })));
+        return files.reduce((a, f) => a.concat(f), []);
+    });
+}
 const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, void 0, function* () {
     //TODO: improve this implementation - e.g. use the glob patterns from the yaml.schemas settings
     core.info('following filepaths found');
@@ -79,6 +90,8 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
         });
     });
     core.info(filePaths.join(' - '));
+    const wsFiles = yield getFiles(workspaceRoot);
+    core.debug(wsFiles.join(' | '));
     return yield Promise.all(filePaths.map((filePath) => __awaiter(void 0, void 0, void 0, function* () {
         core.info('check statuses in ' + filePath);
         const r = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs;
