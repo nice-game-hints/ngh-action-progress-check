@@ -44,7 +44,7 @@ function findStatus(dir) {
     return __awaiter(this, void 0, void 0, function* () {
         const subdirs = dir.split(path.sep);
         for (let i = subdirs.length; i > 0; i--) {
-            const statusFileLocation = path.join(...subdirs.slice(0, i + 1), '_status.yml');
+            const statusFileLocation = path.join('', ...subdirs.slice(0, i + 1), '_status.yml');
             core.debug(`try to find statuses in ${statusFileLocation}`);
             try {
                 if (!fs.existsSync(statusFileLocation)) {
@@ -94,8 +94,8 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
         });
     });
     core.info(filePaths.join(' - '));
-    const wsFiles = yield getFiles(workspaceRoot);
-    core.debug(wsFiles.join(' | '));
+    // const wsFiles = await getFiles(workspaceRoot)
+    // core.debug(wsFiles.join(' | '))
     return yield Promise.all(filePaths.map((filePath) => __awaiter(void 0, void 0, void 0, function* () {
         core.info('check statuses in ' + filePath);
         const r = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs;
