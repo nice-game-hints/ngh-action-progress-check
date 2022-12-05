@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import { validateProgress } from './ngh-progress-validator'
-import {wait} from './wait'
 
 async function run(): Promise<void> {
   try {
