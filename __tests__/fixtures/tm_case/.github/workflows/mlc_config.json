@@ -1,0 +1,14 @@
+{
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "/github/workspace/"
+    }
+  ],
+  "ignorePatterns": [
+    {
+      "pattern": "^http[s]{0,1}://"
+    },
+    { "pattern": "^(?!.*[.]md$).*$" }
+  ]
+}

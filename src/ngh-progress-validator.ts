@@ -59,16 +59,23 @@ export const validateProgress = async (
 	return await Promise.all(
 		filePaths.map(async filePath => {
 			core.info('check statuses in ' + filePath)
-			const allowedStatuses = await findStatus(path.join(workspaceRoot, path.dirname(filePath)))
 			const r = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs
 			const mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8')
 			const m = mdFile.matchAll(r)
-			for (const match of m) {
-				const verb = match[1]
-				const state = match[2]
-				core.debug(` found: ${verb} ${state}`)
-				if (!allowedStatuses.includes(state)) {
-					core.warning(`invalid state ${state} in ${filePath}`)
+			try {
+				const allowedStatuses = await findStatus(path.join(workspaceRoot, path.dirname(filePath)))
+				for (const match of m) {
+					const verb = match[1]
+					const state = match[2]
+					core.debug(` found: ${verb} ${state}`)
+					if (!allowedStatuses.includes(state)) {
+						core.warning(`invalid state ${state} in ${filePath}`)
+						return { filePath, valid: false }
+					}
+				}
+			} catch {
+				if (!m.next().done) {
+					core.warning(' has statuses, but no valid statuses found!')
 					return { filePath, valid: false }
 				}
 			}

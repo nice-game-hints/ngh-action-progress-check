@@ -30,3 +30,16 @@ test('invalid case', async () => {
     valid: true
   })
 })
+
+test('real case', async () => {
+  const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'tm_case')
+  const results = await validateProgress(ip, '**/*.md')
+  expect(results).toContainEqual({
+    filePath: 'part-1/enter-arcade.md',
+    valid: true
+  })
+  expect(results).toContainEqual({
+    filePath: 'index.md',
+    valid: true
+  })
+})

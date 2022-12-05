@@ -1,0 +1,372 @@
+- part-1:
+    title: Part 1
+    spoiler: false
+    ui:
+      px: -92.5
+      py: 491
+- item:ArcadeNote:
+    spoiler: false
+    ui:
+      px: 273
+      py: 33.25
+    when: null
+- item:Balloon:
+    spoiler: false
+    ui:
+      px: 277.25
+      py: 201
+    when: part-1
+- item:EarnedTickets:
+    spoiler: false
+    ui:
+      px: 5263.333333333333
+      py: 107
+    when: null
+- item:Toothpicks:
+    spoiler: false
+    ui:
+      px: 1154
+      py: 566.75
+    when: ArcadeEntrance-entered
+- item:CoffeeCup:
+    spoiler: false
+    ui:
+      px: 5267.333333333333
+      py: 447.3333333333333
+    when: PunchMachine-hasGoldenPunchBag
+- item:CarOil:
+    spoiler: false
+    ui:
+      px: 280.75
+      py: 345
+    when: part-1
+- item:ToyArrow:
+    spoiler: false
+    ui:
+      px: 1164.25
+      py: 178
+    when: ArcadeEntrance-entered
+- item:Lighter:
+    spoiler: false
+    ui:
+      px: 2322
+      py: 508.75
+    when: MainteinanceGirl-hasMatches
+- item:Sand:
+    spoiler: false
+    ui:
+      px: 3999
+      py: 512.3333333333334
+    when: PunchBag-isCut
+- MainteinanceGirlYack-e84f33:
+    spoiler: false
+    ui:
+      px: 1899
+      py: -106.25
+    when: null
+- MainteinanceGirlYack-c4fd43:
+    spoiler: false
+    ui:
+      px: 1511
+      py: -306.25
+    when: null
+- MainteinanceGirlYack-entered:
+    spoiler: false
+    ui:
+      px: 1721.25
+      py: -271
+    when: null
+- MainteinanceGirlYack-60a941:
+    spoiler: false
+    ui:
+      px: 1763.75
+      py: -410
+    when: null
+- MainteinanceGirlYack-knowsWhatSheIsDoing:
+    spoiler: false
+    ui:
+      px: 1658
+      py: -119
+    when: null
+- ArcadeEntrance-entered:
+    spoiler: false
+    ui:
+      px: 760.75
+      py: 423
+    when: Balloon-painted
+- CoffeeCup-gotEnentranceOne:
+    spoiler: false
+    ui:
+      px: 1407
+      py: 1108.75
+    when: part-1
+- CoffeeCup-gotHiddenOne:
+    spoiler: false
+    ui:
+      px: 1477.5
+      py: 980
+    when: HiddenCup-triedSomething
+- CoffeeCup-gotBarOne:
+    spoiler: false
+    ui:
+      px: 1407.25
+      py: 851
+    when: ArcadeEntrance-entered
+- ToyArrow-isCutGlass:
+    spoiler: false
+    ui:
+      px: 3529
+      py: -16.666666666666668
+    when: RevisorYack-gotMultiuseKnife,item:ToyArrow
+- RevisorYack-b8f632:
+    spoiler: false
+    ui:
+      px: 2682
+      py: -341.3333333333333
+    when: null
+- RevisorYack-canGoIn:
+    spoiler: false
+    ui:
+      px: 3139.6666666666665
+      py: -223
+    when: null
+- RevisorYack-b37ebc:
+    spoiler: false
+    ui:
+      px: 2458.3333333333335
+      py: -219
+    when: null
+- RevisorYack-9df09c:
+    spoiler: false
+    ui:
+      px: 3121
+      py: -349.3333333333333
+    when: null
+- RevisorYack-335f88:
+    spoiler: false
+    ui:
+      px: 2460
+      py: -352.6666666666667
+    when: null
+- RevisorYack-46c59a:
+    spoiler: false
+    ui:
+      px: 2897.3333333333335
+      py: -346
+    when: null
+- RevisorYack-5dbbee:
+    spoiler: false
+    ui:
+      px: 2686.6666666666665
+      py: -213
+    when: null
+- RevisorYack-da0af4:
+    spoiler: false
+    ui:
+      px: 2902
+      py: -210.33333333333334
+    when: null
+- RevisorYack-gotMultiuseKnife:
+    spoiler: false
+    ui:
+      px: 3189.25
+      py: 422.75
+    when: EarnedTickets-gotBowlingOnes,EarnedTickets-gotTinyShooterOnes
+- RevisorYack-gotGoldenBall:
+    spoiler: false
+    ui:
+      px: 4398.666666666667
+      py: 190
+    when: EarnedTickets-gotTicketBoxOnes
+- RevisorYack-2f70ae:
+    spoiler: false
+    ui:
+      px: 2880
+      py: 98.75
+    when: null
+- Toothpicks-areMatches:
+    spoiler: false
+    ui:
+      px: 1873.75
+      py: 508
+    when: Toothpicks-hasFertilizer,item:DragonTooth
+- Toothpicks-wet:
+    spoiler: false
+    ui:
+      px: 1392
+      py: 566.75
+    when: item:Toothpicks
+- Toothpicks-hasFertilizer:
+    spoiler: false
+    ui:
+      px: 1635.25
+      py: 568
+    when: Toothpicks-wet
+- PunchMachine-hasGoldenPunchBag:
+    spoiler: false
+    ui:
+      px: 4961
+      py: 268.75
+    when: PunchBag-hasGoldenBall
+- TinyHeroArcade-played:
+    spoiler: false
+    ui:
+      px: 2556
+      py: 511.25
+    when: item:Lighter
+- Balloon-painted:
+    spoiler: false
+    ui:
+      px: 531.75
+      py: 422
+    when: item:Balloon,item:CarOil
+- EarnedTickets-gotTicketBoxOnes:
+    spoiler: false
+    ui:
+      px: 3810.6666666666665
+      py: -13
+    when: ToyArrow-isCutGlass
+- EarnedTickets-gotTinyShooterOnes:
+    spoiler: false
+    ui:
+      px: 2807.75
+      py: 509
+    when: TinyHeroArcade-played
+- EarnedTickets-gotBowlingOnes:
+    spoiler: false
+    ui:
+      px: 2811
+      py: 367.25
+    when: Coin-used
+- BarmanYack-d46b80:
+    spoiler: false
+    ui:
+      px: 4428.5
+      py: 431
+    when: null
+- BarmanYack-0210c4:
+    spoiler: false
+    ui:
+      px: 4535.25
+      py: 769
+    when: null
+- BarmanYack-1935d8:
+    spoiler: false
+    ui:
+      px: 4248.5
+      py: 624.5
+    when: null
+- BarmanYack-knowsAboutCocktailGrownUp:
+    spoiler: false
+    ui:
+      px: 1409
+      py: 1245.75
+    when: ArcadeEntrance-entered
+- BarmanYack-e84f33:
+    spoiler: false
+    ui:
+      px: 4291
+      py: 770.25
+    when: null
+- PirateYack-learnedThatPirateKnowsTheLighterTrick:
+    spoiler: false
+    ui:
+      px: 1168
+      py: -289.42857142857144
+    when: null
+- PirateYack-86b9db:
+    spoiler: false
+    ui:
+      px: 4417.75
+      py: -106
+    when: null
+- PirateYack-ad5708:
+    spoiler: false
+    ui:
+      px: 4413.75
+      py: -30
+    when: null
+- PirateYack-11093d:
+    spoiler: false
+    ui:
+      px: 4431.5
+      py: 51
+    when: null
+- PirateYack-ad30d6:
+    spoiler: false
+    ui:
+      px: 4167
+      py: -69.75
+    when: null
+- PirateYack-entered:
+    spoiler: false
+    ui:
+      px: 4628.25
+      py: -20
+    when: null
+- PirateYack-toldAboutLighterTrick:
+    spoiler: false
+    ui:
+      px: 1170.25
+      py: 6
+    when: ArcadeEntrance-entered
+- PirateYack-d98780:
+    spoiler: false
+    ui:
+      px: 4647.75
+      py: 65
+    when: null
+- Coin-used:
+    spoiler: false
+    ui:
+      px: 1418
+      py: 342.75
+    when: ArcadeMachineButton-pushed
+- MainteinanceGirl-hasMatches:
+    spoiler: false
+    ui:
+      px: 2099.75
+      py: 509
+    when: Toothpicks-areMatches
+- ReuseCoffeeCupsPromo-isRead:
+    spoiler: false
+    ui:
+      px: 4958
+      py: 89.33333333333333
+    when: null
+- ArcadeMachineButton-pushed:
+    spoiler: false
+    ui:
+      px: 1156
+      py: 346
+    when: ArcadeEntrance-entered
+- NoLightersSign-read:
+    spoiler: false
+    ui:
+      px: 1171
+      py: -135.25
+    when: ArcadeEntrance-entered
+- PunchBag-hasGoldenBall:
+    spoiler: false
+    ui:
+      px: 4705.666666666667
+      py: 270
+    when: PunchBag-isCut,RevisorYack-gotGoldenBall
+- PunchBag-isCut:
+    spoiler: false
+    ui:
+      px: 3684
+      py: 288.75
+    when: RevisorYack-gotMultiuseKnife
+- item:DragonTooth:
+    spoiler: false
+    ui:
+      px: 1635.25
+      py: 430
+    when: ArcadeEntrance-entered
+- HiddenCup-triedSomething:
+    spoiler: false
+    ui:
+      px: 1272.25
+      py: 979.75
+    when: ArcadeEntrance-entered
