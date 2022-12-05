@@ -78,16 +78,18 @@ export const validateProgress = async (
 	return await Promise.all(
 		filePaths.map(async filePath => {
 			core.info('check statuses in ' + filePath)
-			const r = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs
+			const contentR = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs
+			const hintR = /\#.*?\(\((when|until) (.*?)\)\)/gs
 			const mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8')
-			const m = mdFile.matchAll(r)
+			const contentM = mdFile.matchAll(contentR)
+			const hintM = mdFile.matchAll(hintR)
 			try {
 				const allowedStatuses = await findStatus(path.join(workspaceRoot, path.dirname(filePath)))
-				for (const match of m) {
+				for (const match of contentM) {
 					const verb = match[1]
 					const verb2 = match[4]
 					const state = match[2]
-					core.debug(`${filePath}: found ${verb} ${state} with closing ${verb2}`)
+					core.debug(`${filePath}: found content ${verb} ${state} with closing ${verb2}`)
 					if (verb !== verb2) {
 						core.warning(`${filePath}: mismatching verbs on state ${state} (${verb} vs ${verb2})`)
 						return { filePath, valid: false }
@@ -97,8 +99,17 @@ export const validateProgress = async (
 						return { filePath, valid: false }
 					}
 				}
-			} catch {
-				if (!m.next().done) {
+				for (const match of hintM) {
+					const verb = match[1]
+					const state = match[2]
+					core.debug(`${filePath}: found hint ${verb} ${state}`)
+					if (!allowedStatuses.includes(state)) {
+						core.warning(`${filePath}: invalid state ${state}`)
+						return { filePath, valid: false }
+					}
+				}
+			} catch (e) {
+				if (!contentM.next().done || !hintM.next().done) {
 					core.warning(filePath + ': has statuses, but no valid status.yml found!')
 					return { filePath, valid: false }
 				}
