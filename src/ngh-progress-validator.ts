@@ -18,6 +18,7 @@ async function findStatus(dir: string): Promise<string[]> {
 
 	for (let i = subdirs.length; i > 0; i--) {
 		const statusFileLocation = path.join(...subdirs.slice(0, i+1), '_status.yml')
+		core.debug(`try to find statuses in ${statusFileLocation}`)
 		try {
 			const statusFile = await fs.promises.readFile(statusFileLocation)
 			const statusYaml = yaml.load(statusFile)
