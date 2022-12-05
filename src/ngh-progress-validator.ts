@@ -2,6 +2,7 @@ import { promisify } from 'util'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as core from '@actions/core'
+import {getYaml} from './file-reader'
 import {glob} from 'glob'
 import { connected } from 'process'
 const yaml = require('js-yaml')
@@ -83,6 +84,7 @@ export const validateProgress = async (
 			const mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8')
 			const contentM = mdFile.matchAll(contentR)
 			const hintM = mdFile.matchAll(hintR)
+			const yamlDocument = await getYaml(path.join(workspaceRoot, filePath))
 			try {
 				const allowedStatuses = await findStatus(path.join(workspaceRoot, path.dirname(filePath)))
 				for (const match of contentM) {
@@ -96,7 +98,6 @@ export const validateProgress = async (
 					}
 					for (const ss of state.split(/[,|]/)) {
 						if (!allowedStatuses.includes(ss)) {
-							console.log(state, ss)
 							core.warning(`${filePath}: invalid content state ${ss}`)
 							return { filePath, valid: false }
 						}
@@ -108,8 +109,23 @@ export const validateProgress = async (
 					core.debug(`${filePath}: found hint ${verb} ${state}`)
 					for (const ss of state.split(/[,|]/)) {
 						if (!allowedStatuses.includes(ss)) {
-							console.log(state, ss)
 							core.warning(`${filePath}: invalid hint state ${ss}`)
+							return { filePath, valid: false }
+						}
+					}
+				}
+				if (yamlDocument.when) {
+					for (const ss of yamlDocument.when.split(/[,|]/)) {
+						if (!allowedStatuses.includes(ss)) {
+							core.warning(`${filePath}: invalid when state ${ss}`)
+							return { filePath, valid: false }
+						}
+					}
+				}
+				if (yamlDocument.until) {
+					for (const ss of yamlDocument.until.split(/[,|]/)) {
+						if (!allowedStatuses.includes(ss)) {
+							core.warning(`${filePath}: invalid until state ${ss}`)
 							return { filePath, valid: false }
 						}
 					}

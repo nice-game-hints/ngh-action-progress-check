@@ -1,5 +1,7 @@
 ---
 title: SubMD
+when: prg-a
+until: prg-c
 ---
 
 Here's also ((when prg-a))stuff((/when)).

@@ -37,6 +37,7 @@ const util_1 = require("util");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const core = __importStar(require("@actions/core"));
+const file_reader_1 = require("./file-reader");
 const glob_1 = require("glob");
 const yaml = require('js-yaml');
 const readdir = (0, util_1.promisify)(fs.readdir);
@@ -103,6 +104,7 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
         const mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8');
         const contentM = mdFile.matchAll(contentR);
         const hintM = mdFile.matchAll(hintR);
+        const yamlDocument = yield (0, file_reader_1.getYaml)(path.join(workspaceRoot, filePath));
         try {
             const allowedStatuses = yield findStatus(path.join(workspaceRoot, path.dirname(filePath)));
             for (const match of contentM) {
@@ -116,7 +118,6 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
                 }
                 for (const ss of state.split(/[,|]/)) {
                     if (!allowedStatuses.includes(ss)) {
-                        console.log(state, ss);
                         core.warning(`${filePath}: invalid content state ${ss}`);
                         return { filePath, valid: false };
                     }
@@ -128,8 +129,23 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
                 core.debug(`${filePath}: found hint ${verb} ${state}`);
                 for (const ss of state.split(/[,|]/)) {
                     if (!allowedStatuses.includes(ss)) {
-                        console.log(state, ss);
                         core.warning(`${filePath}: invalid hint state ${ss}`);
+                        return { filePath, valid: false };
+                    }
+                }
+            }
+            if (yamlDocument.when) {
+                for (const ss of yamlDocument.when.split(/[,|]/)) {
+                    if (!allowedStatuses.includes(ss)) {
+                        core.warning(`${filePath}: invalid when state ${ss}`);
+                        return { filePath, valid: false };
+                    }
+                }
+            }
+            if (yamlDocument.until) {
+                for (const ss of yamlDocument.until.split(/[,|]/)) {
+                    if (!allowedStatuses.includes(ss)) {
+                        core.warning(`${filePath}: invalid until state ${ss}`);
                         return { filePath, valid: false };
                     }
                 }

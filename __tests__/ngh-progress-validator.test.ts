@@ -37,6 +37,10 @@ test('invalid case', async () => {
     filePath: 'invalid-hint.md',
     valid: false
   })
+  expect(results).toContainEqual({
+    filePath: 'invalid-meta.md',
+    valid: false
+  })
 })
 
 test('real case', async () => {
