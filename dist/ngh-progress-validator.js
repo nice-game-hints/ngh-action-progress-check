@@ -42,22 +42,18 @@ const yaml = require('js-yaml');
 const readdir = (0, util_1.promisify)(fs.readdir);
 function findStatus(dir) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(dir);
         const subdirs = dir.split(path.sep);
-        console.log(subdirs);
         for (let i = subdirs.length; i > 0; i--) {
-            console.log('subdir:', i, subdirs.slice(0, i + 1));
             const statusFileLocation = path.join(...subdirs.slice(0, i + 1), '_status.yml');
-            console.log(statusFileLocation);
             try {
                 const statusFile = yield fs.promises.readFile(statusFileLocation);
                 const statusYaml = yaml.load(statusFile);
                 const statuses = Object.values(statusYaml).map(sv => Object.keys(sv)[0]);
-                console.log(statuses);
+                core.debug('found statuses in ' + statusFileLocation);
+                core.debug(statuses.join(' - '));
                 return statuses;
             }
             catch (nofound) {
-                console.log(statusFileLocation);
             }
         }
         throw 'No status found for ' + dir;
@@ -80,25 +76,23 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
             c(files);
         });
     });
-    core.debug('de');
-    console.log(filePaths.join(' - '));
     core.info(filePaths.join(' - '));
     return yield Promise.all(filePaths.map((filePath) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(filePath);
+        core.info('check statuses in ' + filePath);
         const allowedStatuses = yield findStatus(path.join(workspaceRoot, path.dirname(filePath)));
-        console.log(allowedStatuses);
         const r = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs;
         const mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8');
         const m = mdFile.matchAll(r);
         for (const match of m) {
             const verb = match[1];
             const state = match[2];
-            console.log(verb, state);
+            core.debug(` found: ${verb} ${state}`);
             if (!allowedStatuses.includes(state)) {
                 core.warning(`invalid state ${state} in ${filePath}`);
                 return { filePath, valid: false };
             }
         }
+        core.debug(` was ok`);
         return { filePath, valid: true };
     })));
 });
