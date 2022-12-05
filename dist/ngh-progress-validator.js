@@ -55,6 +55,7 @@ function findStatus(dir) {
                 return statuses;
             }
             catch (nofound) {
+                core.debug(`exception during reading ${statusFileLocation}: ${nofound}`);
             }
         }
         throw 'No status found for ' + dir;

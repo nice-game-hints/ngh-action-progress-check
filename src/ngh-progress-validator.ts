@@ -27,6 +27,7 @@ async function findStatus(dir: string): Promise<string[]> {
 			core.debug(statuses.join(' - '))
 			return statuses
 		} catch (nofound) {
+			core.debug(`exception during reading ${statusFileLocation}: ${nofound}`)
 		}
 	}
 	throw 'No status found for ' + dir
