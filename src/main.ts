@@ -25,7 +25,7 @@ async function run(): Promise<void> {
     } else {
       core.info(`✅ NGH progress validation completed successfully`)
     }
-  } catch (error) {
+  } catch (error: any) {
     core.setFailed(error.message)
   }
 }
