@@ -29,6 +29,10 @@ test('invalid case', async () => {
     filePath: 'submd/index.md',
     valid: true
   })
+  expect(results).toContainEqual({
+    filePath: 'mismatch.md',
+    valid: false
+  })
 })
 
 test('real case', async () => {

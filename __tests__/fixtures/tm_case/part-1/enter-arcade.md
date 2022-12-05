@@ -8,7 +8,7 @@ order: 10
 The revisor don't see very well, maybe you can build a guardian
 
 #
-If you hold ((when item:Balloon))the((/when))((until item:Balloon))a((/when)) balloon it will be taller than you
+If you hold ((when item:Balloon))the((/when))((until item:Balloon))a((/until)) balloon it will be taller than you
 
 # ((until item:Balloon))
 There are balloons next to the entrance

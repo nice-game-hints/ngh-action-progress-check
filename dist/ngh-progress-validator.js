@@ -86,21 +86,26 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
             const allowedStatuses = yield findStatus(path.join(workspaceRoot, path.dirname(filePath)));
             for (const match of m) {
                 const verb = match[1];
+                const verb2 = match[4];
                 const state = match[2];
-                core.debug(` found: ${verb} ${state}`);
+                core.debug(`${filePath}: found ${verb} ${state} with closing ${verb2}`);
+                if (verb !== verb2) {
+                    core.warning(`${filePath}: mismatching verbs on state ${state} (${verb} vs ${verb2})`);
+                    return { filePath, valid: false };
+                }
                 if (!allowedStatuses.includes(state)) {
-                    core.warning(`invalid state ${state} in ${filePath}`);
+                    core.warning(`${filePath}: invalid state ${state}`);
                     return { filePath, valid: false };
                 }
             }
         }
         catch (_a) {
             if (!m.next().done) {
-                core.warning(' has statuses, but no valid statuses found!');
+                core.warning(filePath + ': has statuses, but no valid status.yml found!');
                 return { filePath, valid: false };
             }
         }
-        core.debug(` was ok`);
+        core.debug(`${filePath} was ok`);
         return { filePath, valid: true };
     })));
 });
