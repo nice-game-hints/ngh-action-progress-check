@@ -50,4 +50,12 @@ test('real case', async () => {
     filePath: 'index.md',
     valid: true
   })
+  expect(results).toContainEqual({
+    filePath: 'part-1/get-cocktail.md',
+    valid: false
+  })
+  expect(results).toContainEqual({
+    filePath: 'part-1/multi-knife.md',
+    valid: true
+  })
 })

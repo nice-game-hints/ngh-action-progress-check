@@ -94,18 +94,24 @@ export const validateProgress = async (
 						core.warning(`${filePath}: mismatching verbs on state ${state} (${verb} vs ${verb2})`)
 						return { filePath, valid: false }
 					}
-					if (!allowedStatuses.includes(state)) {
-						core.warning(`${filePath}: invalid state ${state}`)
-						return { filePath, valid: false }
+					for (const ss of state.split(/[,|]/)) {
+						if (!allowedStatuses.includes(ss)) {
+							console.log(state, ss)
+							core.warning(`${filePath}: invalid content state ${ss}`)
+							return { filePath, valid: false }
+						}
 					}
 				}
 				for (const match of hintM) {
 					const verb = match[1]
 					const state = match[2]
 					core.debug(`${filePath}: found hint ${verb} ${state}`)
-					if (!allowedStatuses.includes(state)) {
-						core.warning(`${filePath}: invalid state ${state}`)
-						return { filePath, valid: false }
+					for (const ss of state.split(/[,|]/)) {
+						if (!allowedStatuses.includes(ss)) {
+							console.log(state, ss)
+							core.warning(`${filePath}: invalid hint state ${ss}`)
+							return { filePath, valid: false }
+						}
 					}
 				}
 			} catch (e) {
