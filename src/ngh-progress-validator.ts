@@ -85,17 +85,19 @@ export const validateProgress = async (
 			const contentM = mdFile.matchAll(contentR)
 			const hintM = mdFile.matchAll(hintR)
 			const yamlDocument = await getYaml(path.join(workspaceRoot, filePath))
+			console.log(filePath)
 			try {
 				const allowedStatuses = await findStatus(path.join(workspaceRoot, path.dirname(filePath)))
 				for (const match of contentM) {
 					const verb = match[1]
 					const verb2 = match[4]
-					const state = match[2]
+					let state = match[2]
 					core.debug(`${filePath}: found content ${verb} ${state} with closing ${verb2}`)
 					if (verb !== verb2) {
 						core.warning(`${filePath}: mismatching verbs on state ${state} (${verb} vs ${verb2})`)
 						return { filePath, valid: false }
 					}
+					state = state.replace(/^\!/, '')
 					for (const ss of state.split(/[,|]/)) {
 						if (!allowedStatuses.includes(ss)) {
 							core.warning(`${filePath}: invalid content state ${ss}`)
@@ -105,8 +107,9 @@ export const validateProgress = async (
 				}
 				for (const match of hintM) {
 					const verb = match[1]
-					const state = match[2]
+					let state = match[2]
 					core.debug(`${filePath}: found hint ${verb} ${state}`)
+					state = state.replace(/^\!/, '')
 					for (const ss of state.split(/[,|]/)) {
 						if (!allowedStatuses.includes(ss)) {
 							core.warning(`${filePath}: invalid hint state ${ss}`)
@@ -115,7 +118,8 @@ export const validateProgress = async (
 					}
 				}
 				if (yamlDocument.when) {
-					for (const ss of yamlDocument.when.split(/[,|]/)) {
+					const state = yamlDocument.when.replace(/^!/, '')
+					for (const ss of state.split(/[,|]/)) {
 						if (!allowedStatuses.includes(ss)) {
 							core.warning(`${filePath}: invalid when state ${ss}`)
 							return { filePath, valid: false }
@@ -123,7 +127,8 @@ export const validateProgress = async (
 					}
 				}
 				if (yamlDocument.until) {
-					for (const ss of yamlDocument.until.split(/[,|]/)) {
+					const state = yamlDocument.until.replace(/^!/, '')
+					for (const ss of state.split(/[,|]/)) {
 						if (!allowedStatuses.includes(ss)) {
 							core.warning(`${filePath}: invalid until state ${ss}`)
 							return { filePath, valid: false }
