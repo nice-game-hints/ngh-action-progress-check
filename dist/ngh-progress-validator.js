@@ -47,7 +47,11 @@ function findStatus(dir) {
             const statusFileLocation = path.join(...subdirs.slice(0, i + 1), '_status.yml');
             core.debug(`try to find statuses in ${statusFileLocation}`);
             try {
-                const statusFile = yield fs.promises.readFile(statusFileLocation);
+                if (!fs.existsSync(statusFileLocation)) {
+                    core.debug(`${statusFileLocation} not found`);
+                    continue;
+                }
+                const statusFile = fs.readFileSync(statusFileLocation);
                 const statusYaml = yaml.load(statusFile);
                 const statuses = Object.values(statusYaml).map(sv => Object.keys(sv)[0]);
                 core.debug('found statuses in ' + statusFileLocation);
@@ -55,7 +59,7 @@ function findStatus(dir) {
                 return statuses;
             }
             catch (nofound) {
-                core.debug(`exception during reading ${statusFileLocation}: ${nofound}`);
+                core.error(`exception during reading ${statusFileLocation}: ${nofound}`);
             }
         }
         throw 'No status found for ' + dir;
