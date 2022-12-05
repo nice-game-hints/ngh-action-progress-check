@@ -17,7 +17,7 @@ async function findStatus(dir: string): Promise<string[]> {
 	const subdirs = dir.split(path.sep)
 
 	for (let i = subdirs.length; i > 0; i--) {
-		const statusFileLocation = path.join('', ...subdirs.slice(0, i+1), '_status.yml')
+		const statusFileLocation = (dir.startsWith('/') ? '/' : '') + path.join(...subdirs.slice(0, i+1), '_status.yml')
 		core.debug(`try to find statuses in ${statusFileLocation}`)
 		try {
 			if (!fs.existsSync(statusFileLocation)) {
