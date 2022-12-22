@@ -99,33 +99,18 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
     // core.debug(wsFiles.join(' | '))
     return yield Promise.all(filePaths.map((filePath) => __awaiter(void 0, void 0, void 0, function* () {
         core.info('check statuses in ' + filePath);
-        const contentR = /\(\((when|until) (.*?)\)\)(.*?)\(\(\/(when|until)\)\)/gs;
-        const hintR = /\#.*?\(\((when|until) (.*?)\)\)/gs;
-        const mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8');
-        const contentM = mdFile.matchAll(contentR);
-        const hintM = mdFile.matchAll(hintR);
+        const failures = [];
+        const contentR = /\(\((\/){0,1}(when|until)\s*?(\S*?)\)\)/gs;
+        const hintR = /^\#.*?\(\((when|until) (.*?)\)\).*$/gm;
+        let mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8');
         const yamlDocument = yield (0, file_reader_1.getYaml)(path.join(workspaceRoot, filePath));
-        console.log(filePath);
+        let hintM, contentM;
         try {
             const allowedStatuses = yield findStatus(path.join(workspaceRoot, path.dirname(filePath)));
-            for (const match of contentM) {
-                const verb = match[1];
-                const verb2 = match[4];
-                let state = match[2];
-                core.debug(`${filePath}: found content ${verb} ${state} with closing ${verb2}`);
-                if (verb !== verb2) {
-                    core.warning(`${filePath}: mismatching verbs on state ${state} (${verb} vs ${verb2})`);
-                    return { filePath, valid: false };
-                }
-                state = state.replace(/^\!/, '');
-                for (const ss of state.split(/[,|]/)) {
-                    if (!allowedStatuses.includes(ss)) {
-                        core.warning(`${filePath}: invalid content state ${ss}`);
-                        return { filePath, valid: false };
-                    }
-                }
-            }
+            hintM = mdFile.matchAll(hintR);
+            // Check and remove hints
             for (const match of hintM) {
+                mdFile = mdFile.replace(match[0], '');
                 const verb = match[1];
                 let state = match[2];
                 core.debug(`${filePath}: found hint ${verb} ${state}`);
@@ -133,16 +118,50 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
                 for (const ss of state.split(/[,|]/)) {
                     if (!allowedStatuses.includes(ss)) {
                         core.warning(`${filePath}: invalid hint state ${ss}`);
-                        return { filePath, valid: false };
+                        failures.push(`invalid hint state ${ss}`);
                     }
                 }
+            }
+            contentM = mdFile.matchAll(contentR);
+            const whenStack = [];
+            for (const match of contentM) {
+                const verb = match[2];
+                let state = match[3];
+                const ending = !!match[1];
+                // console.log(filePath, verb, state, ending)
+                core.debug(`${filePath}: found content ${verb} ${state}`);
+                if (!ending) {
+                    whenStack.push(verb);
+                    state = state.replace(/^\!/, '');
+                    for (const ss of state.split(/[,|]/)) {
+                        if (!allowedStatuses.includes(ss)) {
+                            core.warning(`${filePath}: invalid content state ${ss}`);
+                            failures.push(`invalid content state ${ss}`);
+                        }
+                    }
+                }
+                else {
+                    const currentVerb = whenStack.pop();
+                    if (currentVerb === undefined) {
+                        core.warning(`${filePath}: unmatched verb ending (${verb})`);
+                        failures.push(`unmatched verb ending (${verb})`);
+                    }
+                    if (currentVerb !== verb) {
+                        core.warning(`${filePath}: mismatching verbs (${currentVerb} vs ${verb})`);
+                        failures.push(`mismatching verbs (${currentVerb} vs ${verb})`);
+                    }
+                }
+            }
+            if (whenStack.length > 0) {
+                core.warning(`${filePath}: unmatched verb begin (${whenStack.join(',')})`);
+                failures.push(`unmatched verb begin (${whenStack.join(',')})`);
             }
             if (yamlDocument.when) {
                 const state = yamlDocument.when.replace(/^!/, '');
                 for (const ss of state.split(/[,|]/)) {
                     if (!allowedStatuses.includes(ss)) {
                         core.warning(`${filePath}: invalid when state ${ss}`);
-                        return { filePath, valid: false };
+                        failures.push(`invalid when state ${ss}`);
                     }
                 }
             }
@@ -151,19 +170,21 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
                 for (const ss of state.split(/[,|]/)) {
                     if (!allowedStatuses.includes(ss)) {
                         core.warning(`${filePath}: invalid until state ${ss}`);
-                        return { filePath, valid: false };
+                        failures.push(`invalid until state ${ss}`);
                     }
                 }
             }
         }
         catch (e) {
-            if (!contentM.next().done || !hintM.next().done) {
+            if ((contentM !== undefined && !(contentM === null || contentM === void 0 ? void 0 : contentM.next().done)) || (hintM !== undefined && !(hintM === null || hintM === void 0 ? void 0 : hintM.next().done))) {
                 core.warning(filePath + ': has statuses, but no valid status.yml found!');
                 return { filePath, valid: false };
             }
         }
-        core.debug(`${filePath} was ok`);
-        return { filePath, valid: true };
+        if (failures.length === 0) {
+            core.debug(`${filePath} was ok`);
+        }
+        return { filePath, valid: failures.length === 0 };
     })));
 });
 exports.validateProgress = validateProgress;
