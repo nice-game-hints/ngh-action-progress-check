@@ -89,12 +89,29 @@ export const validateProgress = async (
 			const failures = []
 			const contentR = /\(\((\/){0,1}(when|until)\s*?(\S*?)\)\)/gs
 			const hintR = /^\#.*?\(\((when|until) (.*?)\)\).*$/gm
+			const buttonR = /\[(\s*)\](\S+)/gm
 			let mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8')
 			const yamlDocument = await getYaml(path.join(workspaceRoot, filePath))
-			let hintM, contentM
+			let hintM, contentM, buttonM
 
 			try {
 				const allowedStatuses = await findStatus(path.join(workspaceRoot, path.dirname(filePath)))
+
+				buttonM = mdFile.matchAll(buttonR)
+
+				for (const match of buttonM) {
+					const state = match[2]
+					core.debug(`${filePath}: found button ${state}`)
+					if (!allowedStatuses.includes(state)) {
+						core.warning(`${filePath}: invalid button state ${state}`)
+						failures.push(`invalid button state ${state}`)
+					}
+					const whitespaces = match[1]
+					if (whitespaces !== ' ') {
+						core.warning(`${filePath}: invalid button format ${match[0]}`)
+						failures.push(`invalid button format ${match[0]}`)
+					}
+				}
 
 				hintM = mdFile.matchAll(hintR)
 				// Check and remove hints

@@ -38,6 +38,14 @@ test('invalid case', async () => {
     valid: false
   })
   expect(results).toContainEqual({
+    filePath: 'invalid-button.md',
+    valid: false
+  })
+  expect(results).toContainEqual({
+    filePath: 'wrong-format-button.md',
+    valid: false
+  })
+  expect(results).toContainEqual({
     filePath: 'invalid-meta.md',
     valid: false
   })
