@@ -27,7 +27,14 @@ async function findStatus(dir: string): Promise<string[]> {
 			}
 			const statusFile = fs.readFileSync(statusFileLocation)
 			const statusYaml = yaml.load(statusFile)
-			const statuses = Object.values(statusYaml).map(sv => Object.keys(sv as {})[0])
+			let statuses
+			if (statusYaml.map != undefined) {
+				// It is a list of dicts!
+				core.debug('old status format in ' + statusFileLocation)
+				statuses = Object.values(statusYaml).map(sv => Object.keys(sv as {})[0])
+			} else {
+				statuses = Object.keys(statusYaml)
+			}
 			core.debug('found statuses in ' + statusFileLocation)
 			core.debug(statuses.join(' - '))
 			return statuses

@@ -1,5 +1,5 @@
-- prg-a:
-- prg-b:
+prg-a:
+prg-b:
   when: prg-a
-- prg-c:
+prg-c:
   when: prg-a
