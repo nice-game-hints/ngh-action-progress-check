@@ -115,9 +115,15 @@ export const validateProgress = async (
 
 				hintM = mdFile.matchAll(hintR)
 				// Check and remove hints
+				const usedVerbs: string[] = []
 				for (const match of hintM) {
 					mdFile = mdFile.replace(match[0], '')
 					const verb = match[1]
+					if (usedVerbs.includes(verb)) {
+						core.warning(`${filePath}: multiple verbs in one hint ${verb}`)
+						failures.push(`multpile verbs in one hint ${verb}`)
+					}
+					usedVerbs.push(verb)
 					let state = match[2]
 					core.debug(`${filePath}: found hint ${verb} ${state}`)
 					state = state.replace(/^\!/, '')

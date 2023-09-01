@@ -38,6 +38,10 @@ test('invalid case', async () => {
     valid: false
   })
   expect(results).toContainEqual({
+    filePath: 'invalid-hint-double.md',
+    valid: false
+  })
+  expect(results).toContainEqual({
     filePath: 'invalid-button.md',
     valid: false
   })
