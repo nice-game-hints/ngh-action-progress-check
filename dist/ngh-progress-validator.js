@@ -119,7 +119,7 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
         core.info('check statuses in ' + filePath);
         const failures = [];
         const contentR = /\(\((\/){0,1}(when|until)\s*(.*?)\)\)/gs;
-        const hintR = /^\#.*?\(\((when|until)\s+(.*?)\)\)\S*$/gm;
+        const hintR = /^\#.*?\(\((when|until)\s+(.*?)\)\).*$/gm;
         const buttonR = /\[(\s*)\](\S+)/gm;
         let mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8');
         const yamlDocument = yield (0, file_reader_1.getYaml)(path.join(workspaceRoot, filePath));
