@@ -74,6 +74,16 @@ function findStatus(dir) {
         throw 'No status found for ' + dir;
     });
 }
+function checkStateValidity(allowedStatuses, state) {
+    // Check if state splitted by one of these (comma, and, or) is in allowedStatuses
+    const splitted = state.split(/,|\s+and\s+|\s+or\s+/);
+    for (const ss of splitted) {
+        if (!allowedStatuses.includes(ss)) {
+            return false;
+        }
+    }
+    return true;
+}
 const stat = (0, util_1.promisify)(fs.stat);
 function getFiles(dir) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -108,8 +118,8 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
     return yield Promise.all(filePaths.map((filePath) => __awaiter(void 0, void 0, void 0, function* () {
         core.info('check statuses in ' + filePath);
         const failures = [];
-        const contentR = /\(\((\/){0,1}(when|until)\s*?(\S*?)\)\)/gs;
-        const hintR = /^\#.*?\(\((when|until) (.*?)\)\).*$/gm;
+        const contentR = /\(\((\/){0,1}(when|until)\s*(.*?)\)\)/gs;
+        const hintR = /^\#.*?\(\((when|until)\s+(.*?)\)\)\S*$/gm;
         const buttonR = /\[(\s*)\](\S+)/gm;
         let mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8');
         const yamlDocument = yield (0, file_reader_1.getYaml)(path.join(workspaceRoot, filePath));
@@ -120,7 +130,7 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
             for (const match of buttonM) {
                 const state = match[2];
                 core.debug(`${filePath}: found button ${state}`);
-                if (!allowedStatuses.includes(state)) {
+                if (!checkStateValidity(allowedStatuses, state)) {
                     core.warning(`${filePath}: invalid button state ${state}`);
                     failures.push(`invalid button state ${state}`);
                 }
@@ -132,16 +142,25 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
             }
             hintM = mdFile.matchAll(hintR);
             // Check and remove hints
-            for (const match of hintM) {
-                mdFile = mdFile.replace(match[0], '');
-                const verb = match[1];
-                let state = match[2];
-                core.debug(`${filePath}: found hint ${verb} ${state}`);
-                state = state.replace(/^\!/, '');
-                for (const ss of state.split(/[,|]/)) {
-                    if (!allowedStatuses.includes(ss)) {
-                        core.warning(`${filePath}: invalid hint state ${ss}`);
-                        failures.push(`invalid hint state ${ss}`);
+            for (const hintMatch of hintM) {
+                mdFile = mdFile.replace(hintMatch[0], '');
+                const hintVerbs = hintMatch[0].matchAll(contentR);
+                const usedVerbs = [];
+                for (const match of hintVerbs) {
+                    const verb = match[2];
+                    if (usedVerbs.includes(verb)) {
+                        core.warning(`${filePath}: multiple verbs in one hint ${verb}`);
+                        failures.push(`multpile verbs in one hint ${verb}`);
+                    }
+                    usedVerbs.push(verb);
+                    let state = match[3];
+                    core.debug(`${filePath}: found hint ${verb} ${state}`);
+                    state = state.replace(/^\!/, '');
+                    for (const ss of state.split(/[,|]/)) {
+                        if (!checkStateValidity(allowedStatuses, state)) {
+                            core.warning(`${filePath}: invalid hint state ${ss}`);
+                            failures.push(`invalid hint state ${ss}`);
+                        }
                     }
                 }
             }
@@ -151,16 +170,13 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
                 const verb = match[2];
                 let state = match[3];
                 const ending = !!match[1];
-                // console.log(filePath, verb, state, ending)
-                core.debug(`${filePath}: found content ${verb} ${state}`);
+                core.debug(`${filePath}: found content ${verb} ${state} ${ending}`);
                 if (!ending) {
                     whenStack.push(verb);
                     state = state.replace(/^\!/, '');
-                    for (const ss of state.split(/[,|]/)) {
-                        if (!allowedStatuses.includes(ss)) {
-                            core.warning(`${filePath}: invalid content state ${ss}`);
-                            failures.push(`invalid content state ${ss}`);
-                        }
+                    if (!checkStateValidity(allowedStatuses, state)) {
+                        core.warning(`${filePath}: invalid content state ${state}`);
+                        failures.push(`invalid content state ${state}`);
                     }
                 }
                 else {
@@ -182,7 +198,7 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
             if (yamlDocument.when) {
                 const state = yamlDocument.when.replace(/^!/, '');
                 for (const ss of state.split(/[,|]/)) {
-                    if (!allowedStatuses.includes(ss)) {
+                    if (!checkStateValidity(allowedStatuses, state)) {
                         core.warning(`${filePath}: invalid when state ${ss}`);
                         failures.push(`invalid when state ${ss}`);
                     }
@@ -191,7 +207,7 @@ const validateProgress = (workspaceRoot, mdGlob) => __awaiter(void 0, void 0, vo
             if (yamlDocument.until) {
                 const state = yamlDocument.until.replace(/^!/, '');
                 for (const ss of state.split(/[,|]/)) {
-                    if (!allowedStatuses.includes(ss)) {
+                    if (!checkStateValidity(allowedStatuses, state)) {
                         core.warning(`${filePath}: invalid until state ${ss}`);
                         failures.push(`invalid until state ${ss}`);
                     }
