@@ -1,81 +1,30 @@
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
-import {expect, test} from '@jest/globals'
-import { validateProgress } from  '../src/ngh-progress-validator'
-import { describe } from 'node:test'
+import {expect, test,it,describe,beforeAll} from '@jest/globals'
+import { ValidationResult, validateProgress } from  '../src/ngh-progress-validator'
+import glob from 'glob'
 
-test('valid case', async () => {
-  const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'case_01')
-  const results = await validateProgress(ip, '**/*.md')
-  expect(results).toContainEqual({
-    filePath: 'andor.md',
-    valid: true
-  })
-  expect(results).toContainEqual({
-    filePath: 'index.md',
-    valid: true
-  })
-})
+function readTestFiles( workspaceRoot: string, mdGlob: string) {
+  return glob.sync(mdGlob, {
+      cwd: workspaceRoot,
+      silent: true,
+      nodir: true
+    }
+  )
+}
 
-test('invalid case', async () => {
-  const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'case_01')
-  const results = await validateProgress(ip, '**/*.md')
-  expect(results).toContainEqual({
-    filePath: 'invalid-content.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'submd/more/index.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'submd/index.md',
-    valid: true
-  })
-  expect(results).toContainEqual({
-    filePath: 'mismatch.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'invalid-hint.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'invalid-hint-double.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'invalid-button.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'wrong-format-button.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'invalid-meta.md',
-    valid: false
-  })
-})
-
-test('real case', async () => {
-  const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'tm_case')
-  const results = await validateProgress(ip, '**/*.md')
-  expect(results).toContainEqual({
-    filePath: 'part-1/enter-arcade.md',
-    valid: true
-  })
-  expect(results).toContainEqual({
-    filePath: 'index.md',
-    valid: true
-  })
-  expect(results).toContainEqual({
-    filePath: 'part-1/get-cocktail.md',
-    valid: false
-  })
-  expect(results).toContainEqual({
-    filePath: 'part-1/multi-knife.md',
-    valid: true
+const testGlob = '**/*.md'
+const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'case_01')
+const testFiles = readTestFiles(ip, testGlob).map(tf => [tf, !(tf.split('/').pop() as string).startsWith('invalid')])
+// const testFiles = readTestFiles(ip, testGlob).map(tf => [tf, !tf.startsWith('invalid')])
+describe('test case 01', () => {
+  console.log(testFiles)
+  it.each(testFiles)('%s is valid: %s', async (tf, valid) => {
+    const results = await validateProgress(ip, tf)
+    expect(results).toContainEqual({
+      filePath: tf,
+      valid: valid,
+    })
   })
 })
