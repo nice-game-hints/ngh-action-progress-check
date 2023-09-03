@@ -10,7 +10,7 @@ This is also a ((until prg-b))valid case ((when prg-c))any case((/when)) when un
 
 And a valid button [ ]prg-b
 
-# hint ((when prg-a or prg-b))
+# hint ((when prg-a or prg-b)) ((until prg-c))
 hint text
 
 # another hint ((when prg-a))

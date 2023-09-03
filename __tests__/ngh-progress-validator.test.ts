@@ -9,6 +9,10 @@ test('valid case', async () => {
   const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'case_01')
   const results = await validateProgress(ip, '**/*.md')
   expect(results).toContainEqual({
+    filePath: 'andor.md',
+    valid: true
+  })
+  expect(results).toContainEqual({
     filePath: 'index.md',
     valid: true
   })
