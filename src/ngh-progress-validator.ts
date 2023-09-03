@@ -99,7 +99,7 @@ export const validateProgress = async (
 			core.info('check statuses in ' + filePath)
 			const failures = []
 			const contentR = /\(\((\/){0,1}(when|until)\s*(.*?)\)\)/gs
-			const hintR = /^\#.*?\(\((when|until)\s+(.*?)\)\)\S*$/gm
+			const hintR = /^\#.*?\(\((when|until)\s+(.*?)\)\).*$/gm
 			const buttonR = /\[(\s*)\](\S+)/gm
 			let mdFile = fs.readFileSync(path.join(workspaceRoot, filePath)).toString('utf-8')
 			const yamlDocument = await getYaml(path.join(workspaceRoot, filePath))

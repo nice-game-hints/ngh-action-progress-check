@@ -19,7 +19,7 @@ const ip = path.join(__dirname, '..', '__tests__', 'fixtures', 'case_01')
 const testFiles = readTestFiles(ip, testGlob).map(tf => [tf, !(tf.split('/').pop() as string).startsWith('invalid')])
 // const testFiles = readTestFiles(ip, testGlob).map(tf => [tf, !tf.startsWith('invalid')])
 describe('test case 01', () => {
-  console.log(testFiles)
+
   it.each(testFiles)('%s is valid: %s', async (tf, valid) => {
     const results = await validateProgress(ip, tf)
     expect(results).toContainEqual({
